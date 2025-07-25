@@ -1,6 +1,6 @@
 'use client';
- // @ts-ignore
-import { BlockMath, InlineMath } from 'react-katex';
+ // @ts-expect-error
+import { BlockMath} from 'react-katex';
 import 'katex/dist/katex.min.css';
 
 import { useState } from 'react';
@@ -66,6 +66,7 @@ export default function Home() {
     }
   } catch (err) {
     setResult({ Error: 'Network error' });
+    console.error(err)
   } finally {
     setLoading(false);
   }
@@ -78,7 +79,7 @@ export default function Home() {
       <div className="bg-[#1F1F1F] border border-gray-700 rounded-xl p-8 w-full max-w-2xl shadow-lg">
         <h1 className="text-3xl font-bold text-green-500 mb-2">∑ CalcAI Pro</h1>
         <p className="text-gray-300 mb-6">
-          Your AI-powered calculus assistant. Enter an expression, choose an operation, and let AI do the math! It's mathemagical!
+          {"Your AI-powered calculus assistant. Enter an expression, choose an operation, and let AI do the math! It's mathemagical!"}
         </p>
 
         <label className="block text-sm text-gray-400 mb-1">Expression (LaTeX or standard math)</label>
