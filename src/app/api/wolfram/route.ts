@@ -1,22 +1,45 @@
-// /app/api/wolfram/route.ts (Next.js App Router)
+// /app/api/wolfram/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { parseStringPromise } from 'xml2js';
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { input } = body;
+  const { input } = await req.json();
   const appid = process.env.WOLFRAM_APP_ID;
-
   const query = encodeURIComponent(input);
 
   try {
     const res = await fetch(
-      `https://www.wolframalpha.com/api/v1/llm-api?appid=${appid}&input=${query}`
+      `https://api.wolframalpha.com/v2/query?appid=${appid}&input=${query}&output=XML`
     );
 
-    const text = await res.text();
-    return NextResponse.json({ success: true, result: text });
+    const xml = await res.text();
+
+    const parsed = await parseStringPromise(xml, {
+      explicitArray: false,
+      ignoreAttrs: false,
+      mergeAttrs: true,
+    });
+
+    const pods = parsed?.queryresult?.pod;
+    if (!pods || (Array.isArray(pods) && pods.length === 0)) {
+      return NextResponse.json({ success: false, error: 'No pods returned' });
+    }
+
+    const normalizedPods = (Array.isArray(pods) ? pods : [pods]).map((pod: any) => ({
+      title: pod.title,
+      subpods: (Array.isArray(pod.subpod) ? pod.subpod : [pod.subpod]).map((sp: any) => ({
+        plaintext: sp.plaintext,
+        img: sp.img?.src
+          ? {
+              src: sp.img.src,
+              alt: sp.img.alt || pod.title,
+            }
+          : undefined,
+      })),
+    }));
+
+    return NextResponse.json({ success: true, pods: normalizedPods });
   } catch (err) {
-    return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 });
-    console.error(err)
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
   }
 }

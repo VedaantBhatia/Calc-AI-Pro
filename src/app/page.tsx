@@ -1,78 +1,66 @@
 'use client';
-// @ts-expect-error reat-katex has no types for named import
-import { BlockMath} from 'react-katex';
+// @ts-expect-error react-katex has no types for named import
+import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
 import { useState } from 'react';
+import Image from 'next/image';
+
 function toLatex(input: string): string {
   return input
-    // Handle inverse trig functions like tan^-1(x)
     .replace(/tan\^\(?-1\)?\(?x\)?/gi, '\\arctan{x}')
     .replace(/sin\^\(?-1\)?\(?x\)?/gi, '\\arcsin{x}')
     .replace(/cos\^\(?-1\)?\(?x\)?/gi, '\\arccos{x}')
-    // Handle other standard formatting
     .replace(/d\/dx/g, '\\frac{d}{dx}')
     .replace(/x\^(\d+)/g, 'x^{$1}')
     .replace(/=/g, '=');
 }
 
+type Pod = {
+  title: string;
+  subpods: {
+    plaintext?: string;
+    img?: { src: string; alt?: string };
+  }[];
+};
+
 export default function Home() {
   const [expr, setExpr] = useState('');
   const [type, setType] = useState<'differentiate' | 'integrate'>('differentiate');
-  const [result, setResult] = useState<Record<string, string>>({});
+  const [pods, setPods] = useState<Pod[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
- const handleCompute = async () => {
-  if (!expr.trim()) return;
+  const handleCompute = async () => {
+    if (!expr.trim()) return;
+    setLoading(true);
+    setError(null);
+    setPods([]);
 
-  setLoading(true);
-  setResult({}); // ← we’ll store an object now
+    const query = `${type} ${expr}`;
 
-  const query = `${type} ${expr}`;
+    try {
+      const res = await fetch('/api/wolfram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: query }),
+      });
 
-  try {
-    const res = await fetch('/api/wolfram', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ input: query }),
-    });
+      const data = await res.json();
 
-    const data = await res.json();
-
-    if (!data.success) {
-      setResult({ Error: data.error || 'Unknown' });
-    } else {
-      // 🔽 STEP 1: Parse the response into a key-value object
-      const lines = data.result
-        .split('\n')
-        .map((line: string) => line.trim())
-        .filter(Boolean);
-
-      const parsed: Record<string, string> = {};
-      let currentKey = '';
-
-      for (const line of lines) {
-        if (line.endsWith(':')) {
-          currentKey = line.replace(':', '');
-          parsed[currentKey] = '';
-        } else if (currentKey) {
-          parsed[currentKey] += (parsed[currentKey] ? '\n' : '') + line;
-        }
+      if (!data.success) {
+        setError(data.error || 'Unknown error');
+        return;
       }
 
-      setResult(parsed); // ⬅️ now result is an object
+      setPods(data.pods);
+    } catch (err) {
+      console.error(err);
+      setError('Network error');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setResult({ Error: 'Network error' });
-    console.error(err)
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   return (
     <main className="min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-4 py-12">
@@ -121,66 +109,40 @@ export default function Home() {
           {loading ? 'Computing...' : 'Compute'}
         </button>
 
-        {Object.keys(result).length > 0 && (
-  <div className="mt-8">
-    <h2 className="text-xl font-semibold mb-4">Result</h2>
-    <div className="space-y-4 bg-[#2A2A2A] border border-gray-700 rounded-lg p-6 text-gray-100">
+        {error && (
+          <div className="mt-6 text-red-500 font-semibold text-center">{error}</div>
+        )}
 
-      {result['Query'] && (
-        <div>
-          <h3 className="text-sm text-gray-400 uppercase">Query</h3>
-          <p className="text-lg">{result['Query']}</p>
-        </div>
-      )}
-
-      {result['Derivative'] && (
-  <div>
-    <h3 className="text-sm text-gray-400 uppercase">Derivative</h3>
-    <BlockMath math={toLatex(result['Derivative'])} />
-  </div>
-)}
-
-
-      {result['Plot'] && result['Plot'].includes('image:') && (
-        <div>
-          <h3 className="text-sm text-gray-400 uppercase">Plot</h3>
-          <img
-            src={result['Plot'].match(/image:\s*(.*)/)?.[1] || ''}
-            alt="Plot"
-            className="rounded-lg border border-gray-600 mt-2"
-          />
-        </div>
-      )}
-
-      {result['Properties as a real function'] && (
-        <div>
-          <h3 className="text-sm text-gray-400 uppercase">Properties</h3>
-          <pre className="whitespace-pre-wrap text-sm text-gray-200">{result['Properties as a real function']}</pre>
-        </div>
-      )}
-
-      {result['Indefinite integral'] && (
-        <div>
-          <h3 className="text-sm text-gray-400 uppercase">Indefinite Integral</h3>
-          <p className="text-lg">{result['Indefinite integral']}</p>
-        </div>
-      )}
-
-      {result['Wolfram|Alpha website result for "differentiate x^2"'] && (
-        <div>
-          <a
-            href={result['Wolfram|Alpha website result for "differentiate x^2"']}
-            className="text-green-400 underline"
-            target="_blank"
-          >
-            View full result on Wolfram|Alpha →
-          </a>
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
+        {pods.length > 0 && (
+          <div className="mt-8 space-y-6 bg-[#2A2A2A] border border-gray-700 rounded-lg p-6 text-gray-100">
+            {pods.map((pod, i) => (
+              <div key={i}>
+                <h3 className="text-sm text-gray-400 uppercase mb-2">{pod.title}</h3>
+                {pod.subpods.map((sp, j) => (
+                  <div key={j} className="mb-4">
+                    {sp.img && (
+                      <Image
+                        src={sp.img.src}
+                        alt={sp.img.alt || 'Wolfram Alpha result'}
+                        width={600}
+                        height={150}
+                        unoptimized
+                        className="rounded-lg border border-gray-600"
+                      />
+                    )}
+                    {sp.plaintext && (
+                      /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
+                        <BlockMath math={toLatex(sp.plaintext)} />
+                      ) : (
+                        <p>{sp.plaintext}</p>
+                      )
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
