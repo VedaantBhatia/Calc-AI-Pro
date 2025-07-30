@@ -1,4 +1,6 @@
 'use client';
+
+// @ts-ignore
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
