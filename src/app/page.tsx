@@ -1,5 +1,4 @@
 'use client';
-// @ts-expect-error react-katex has no types for named import
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
