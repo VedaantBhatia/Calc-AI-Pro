@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
      
     const pods = parsed?.queryresult?.pod;
     if (!pods || (Array.isArray(pods) && pods.length === 0)) {
-      return NextResponse.json({ success: false, error: 'No pods returned' });
+      return NextResponse.json({ success: false, error: 'Dont test my patience' });
     }
     const normalizedPods = (Array.isArray(pods) ? pods : [pods]).map((pod: Pod) => ({
   title: pod.title,
