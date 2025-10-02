@@ -190,15 +190,30 @@ export default function Home() {
                       setStepError(data.error || 'Failed to fetch steps');
                       return;
                     }
-                    // Only show pods that are actually steps/derivations
+                    
+                    // Log all pod titles to see what we're getting
+                    console.log('All step pods:', data.pods.map((p: Pod) => p.title));
+                    
+                    // Filter out the duplicate/extra pods (Input, plots, properties, etc.)
+                    // Keep everything EXCEPT the known duplicates
                     const stepOnlyPods = data.pods.filter((p: Pod) => {
                       const title = p.title?.toLowerCase() || '';
-                      // Keep ONLY pods with step/solution/derivation in title
-                      return title.includes('step') || 
-                             title.includes('solution') || 
-                             title.includes('derivation') ||
-                             title.includes('possible steps');
+                      const isExtraStuff = 
+                        title.includes('input') ||
+                        title.includes('plot') ||
+                        title.includes('parabola') ||
+                        title.includes('discriminant') ||
+                        title.includes('properties') ||
+                        title.includes('even') ||
+                        title.includes('minimum') ||
+                        title.includes('maximum') ||
+                        title.includes('root') ||
+                        title.includes('domain') ||
+                        title.includes('range');
+                      return !isExtraStuff;
                     });
+                    
+                    console.log('Filtered step pods:', stepOnlyPods.map((p: Pod) => p.title));
                     setStepPods(stepOnlyPods);
                   } catch (err) {
                     console.error('Step fetch failed', err);
