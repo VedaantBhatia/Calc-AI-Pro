@@ -1,36 +1,32 @@
-// /app/api/wolfram/route.ts
+// /app/api/steps/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseStringPromise } from 'xml2js';
 
-type Subpod = {
-  plaintext?: string;
-  img?: {
-    src: string;
-    alt?: string;
-  };
-};
-
-type Pod = {
-  title: string;
-  subpod: Subpod[] | Subpod;
-  states?: { name: string; input: string }[];
-};
-
 export async function POST(req: NextRequest) {
-  const { input } = await req.json();
+  const { input, podstate } = await req.json();
   const appid = process.env.WOLFRAM_APP_ID;
+
   if (!appid) {
     return NextResponse.json(
       { success: false, error: 'Missing WOLFRAM_APP_ID in environment' },
       { status: 500 }
     );
   }
-  const query = encodeURIComponent(input);
+
+  if (!input || !podstate) {
+    return NextResponse.json(
+      { success: false, error: 'Missing required fields: input, podstate' },
+      { status: 400 }
+    );
+  }
 
   try {
-    const res = await fetch(
-      `https://api.wolframalpha.com/v2/query?appid=${appid}&input=${query}&output=XML`
-    );
+    const q = encodeURIComponent(input);
+    const ps = encodeURIComponent(podstate);
+
+    const url = `https://api.wolframalpha.com/v2/query?appid=${appid}&input=${q}&podstate=${ps}&output=XML`;
+
+    const res = await fetch(url);
     const xml = await res.text();
 
     const parsed = await parseStringPromise(xml, {
@@ -56,7 +52,6 @@ export async function POST(req: NextRequest) {
             }
           : undefined,
       })),
-      // ✅ include states (like Step-by-step solution) if present
       states:
         pod.states && pod.states.state
           ? Array.isArray(pod.states.state)
@@ -67,11 +62,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, pods: normalizedPods });
   } catch (err) {
-    console.error('Server error:', err);
+    console.error('Steps server error:', err);
     return NextResponse.json(
       { success: false, error: 'Server error' },
       { status: 500 }
     );
   }
 }
-
