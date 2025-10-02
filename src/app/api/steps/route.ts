@@ -2,6 +2,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseStringPromise } from 'xml2js';
 
+type RawSubpod = {
+  plaintext?: string;
+  img?: {
+    src: string;
+    alt?: string;
+  };
+};
+
+type RawPod = {
+  title: string;
+  subpod: RawSubpod[] | RawSubpod;
+  states?: {
+    state: { name: string; input: string } | { name: string; input: string }[];
+  };
+};
+
 export async function POST(req: NextRequest) {
   const { input, podstate } = await req.json();
   const appid = process.env.WOLFRAM_APP_ID;
@@ -41,9 +57,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'No pods returned' });
     }
 
-    const normalizedPods = (Array.isArray(pods) ? pods : [pods]).map((pod: any) => ({
+    const normalizedPods = (Array.isArray(pods) ? pods : [pods]).map((pod: RawPod) => ({
       title: pod.title,
-      subpods: (Array.isArray(pod.subpod) ? pod.subpod : [pod.subpod]).map((sp: any) => ({
+      subpods: (Array.isArray(pod.subpod) ? pod.subpod : [pod.subpod]).map((sp: RawSubpod) => ({
         plaintext: sp.plaintext,
         img: sp.img?.src
           ? {
@@ -55,7 +71,7 @@ export async function POST(req: NextRequest) {
       states:
         pod.states && pod.states.state
           ? Array.isArray(pod.states.state)
-            ? pod.states.state.map((s: any) => ({ name: s.name, input: s.input }))
+            ? pod.states.state.map((s: { name: string; input: string }) => ({ name: s.name, input: s.input }))
             : [{ name: pod.states.state.name, input: pod.states.state.input }]
           : [],
     }));
