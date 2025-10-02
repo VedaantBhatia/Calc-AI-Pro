@@ -190,18 +190,14 @@ export default function Home() {
                       setStepError(data.error || 'Failed to fetch steps');
                       return;
                     }
-                    // Filter to only show step-related pods (keep steps, exclude duplicate Input/Result/Plots)
+                    // Only show pods that are actually steps/derivations
                     const stepOnlyPods = data.pods.filter((p: Pod) => {
                       const title = p.title?.toLowerCase() || '';
-                      // Keep pods that contain "step" or "solution" in the title
-                      // Exclude duplicate pods like Input, Result, Plots that are already shown above
-                      return (title.includes('step') || title.includes('solution')) ||
-                             (!title.includes('input') && 
-                              !title.includes('result') && 
-                              !title.includes('plot') &&
-                              !title.includes('derivative at') &&
-                              !title.includes('integral of') &&
-                              !title.includes('indefinite integral'));
+                      // Keep ONLY pods with step/solution/derivation in title
+                      return title.includes('step') || 
+                             title.includes('solution') || 
+                             title.includes('derivation') ||
+                             title.includes('possible steps');
                     });
                     setStepPods(stepOnlyPods);
                   } catch (err) {
