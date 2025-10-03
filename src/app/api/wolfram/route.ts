@@ -1,7 +1,7 @@
 // /app/api/wolfram/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseStringPromise } from 'xml2js';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/lib/auth';
 
 type RawSubpod = {
   plaintext?: string;

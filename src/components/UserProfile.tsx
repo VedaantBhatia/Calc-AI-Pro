@@ -1,6 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 
 /**
  * Example client component showing how to use session data
@@ -23,9 +24,18 @@ export default function UserProfile() {
       <div className="space-y-2 text-sm">
         <p><strong>Name:</strong> {session.user?.name || 'N/A'}</p>
         <p><strong>Email:</strong> {session.user?.email || 'N/A'}</p>
-        <p><strong>Image:</strong> {session.user?.image ? (
-          <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full inline ml-2" />
-        ) : 'N/A'}</p>
+        <p className="flex items-center gap-2">
+          <strong>Image:</strong> 
+          {session.user?.image ? (
+            <Image 
+              src={session.user.image} 
+              alt="Profile" 
+              width={32}
+              height={32}
+              className="rounded-full" 
+            />
+          ) : 'N/A'}
+        </p>
       </div>
     </div>
   )

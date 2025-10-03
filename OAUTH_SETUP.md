@@ -94,7 +94,7 @@ export default function Component() {
 ✅ **Already implemented!** See `ServerUserInfo.tsx` component for a working example.
 
 ```tsx
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 
 export default async function ServerComponent() {
   const session = await auth()
