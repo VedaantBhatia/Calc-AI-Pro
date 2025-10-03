@@ -7,6 +7,8 @@ import 'katex/dist/katex.min.css';
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import AuthButton from '@/components/AuthButton';
 
 function toLatex(input: string): string {
   return input
@@ -28,6 +30,7 @@ type Pod = {
 };
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [expr, setExpr] = useState('');
   const [type, setType] = useState<'differentiate' | 'integrate'>('differentiate');
   const [pods, setPods] = useState<Pod[]>([]);
@@ -73,10 +76,26 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-4 py-12">
       <div className="bg-[#1F1F1F] border border-gray-700 rounded-xl p-8 w-full max-w-2xl shadow-lg">
+        {/* Auth Button at the top */}
+        <div className="flex justify-end mb-4">
+          <AuthButton />
+        </div>
+
         <h1 className="text-3xl font-bold text-green-500 mb-2">∑ CalcAI Pro</h1>
         <p className="text-gray-300 mb-6">
           {"Your AI-powered calculus assistant. Enter an expression, choose an operation, and let AI do the math! It's mathemagical!"}
         </p>
+
+        {/* Show message if not authenticated */}
+        {status === 'loading' && (
+          <div className="text-center text-gray-400 mb-6">Loading authentication...</div>
+        )}
+
+        {!session && status !== 'loading' && (
+          <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mb-6 text-yellow-200">
+            <p className="text-sm">⚠️ Please sign in to use the calculator</p>
+          </div>
+        )}
 
         <label className="block text-sm text-gray-400 mb-1">Expression (LaTeX or standard math)</label>
         <input
@@ -112,7 +131,7 @@ export default function Home() {
         <button
           className="w-full bg-green-500 hover:bg-green-600 transition text-white font-semibold text-lg px-6 py-3 rounded-lg disabled:opacity-50"
           onClick={handleCompute}
-          disabled={!expr || loading}
+          disabled={!expr || loading || !session}
         >
           {loading ? 'Computing...' : 'Compute'}
         </button>

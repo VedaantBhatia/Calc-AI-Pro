@@ -1,6 +1,7 @@
 // /app/api/wolfram/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseStringPromise } from 'xml2js';
+import { auth } from '@/app/api/auth/[...nextauth]/route';
 
 type RawSubpod = {
   plaintext?: string;
@@ -19,6 +20,15 @@ type RawPod = {
 };
 
 export async function POST(req: NextRequest) {
+  // Check authentication
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized - Please sign in' },
+      { status: 401 }
+    );
+  }
+
   const { input } = await req.json();
   const appid = process.env.WOLFRAM_APP_ID;
   if (!appid) {
