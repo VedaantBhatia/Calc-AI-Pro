@@ -1,11 +1,11 @@
 import { auth } from '@/lib/auth'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 /**
  * API endpoint to view authenticated users
  * This is a basic example - in production, you'd store users in a database
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Check if the current user is authenticated and authorized
     const session = await auth()
@@ -14,10 +14,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // For demo purposes, we'll just return the current user's info
-    // In a real app, you'd query a database for all users
     const currentUser = {
-      id: (session.user as any)?.id || 'unknown',
+      id: session.user?.id || 'unknown',
       name: session.user?.name || 'Unknown',
       email: session.user?.email || 'No email',
       image: session.user?.image || null,
