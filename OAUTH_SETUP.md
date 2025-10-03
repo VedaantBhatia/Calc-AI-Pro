@@ -137,6 +137,13 @@ The Wolfram API route (`/api/wolfram`) is now protected and requires authenticat
 - Keep your secrets secure and never commit `.env.local` to version control
 - The `env.example` file has been created as a template
 
+## 🚀 Deploying to Vercel
+
+If you're deploying to Vercel and getting "Server error" messages, see **`VERCEL_DEPLOYMENT.md`** for:
+- Required environment variables setup
+- Google OAuth production configuration
+- Troubleshooting common deployment issues
+
 ## 🔗 Resources
 
 - [NextAuth.js Documentation](https://next-auth.js.org/)
