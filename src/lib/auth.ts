@@ -15,9 +15,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        (session.user as { id?: string }).id = token.sub!
+        session.user.id = token.sub!
       }
       return session
+    },
+    async jwt({ token, account, profile }) {
+      // Persist the OAuth access_token to the token right after signin
+      if (account) {
+        token.accessToken = account.access_token
+        token.provider = account.provider
+      }
+      return token
     },
   },
   pages: {
