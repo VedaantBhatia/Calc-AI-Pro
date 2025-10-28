@@ -49,7 +49,8 @@ export default function Home() {
     setStepPods([]);
     setStepError(null);
 
-    const query = `${type} ${expr}`;
+    // For arithmetic, send just the expression; for calculus operations, prefix with the operation
+    const query = type === 'arithmetic' ? expr : `${type} ${expr}`;
 
     try {
       const res = await fetch('/api/wolfram', {
@@ -217,7 +218,7 @@ export default function Home() {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        input: `${type} ${expr}`,
+                        input: type === 'arithmetic' ? expr : `${type} ${expr}`,
                         podstate: stepStateInput,
                       })
                     });
