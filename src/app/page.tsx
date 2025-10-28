@@ -165,36 +165,37 @@ export default function Home() {
           <>
             <div className="mt-8 space-y-4">
               {pods.map((pod, i) => (
-                <div key={i} className="bg-[#2A2A2A] border border-gray-700 rounded-lg p-5 shadow-md">
-                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-700">
-                    <div className="w-1 h-5 bg-green-500 rounded"></div>
-                    <h3 className="text-base font-semibold text-green-400">{pod.title}</h3>
+                <div key={i} className="bg-[#2A2A2A] border border-gray-700 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-[#1F1F1F] border-b border-gray-700">
+                    <div className="w-1 h-4 bg-green-500 rounded"></div>
+                    <h3 className="text-sm font-semibold text-green-400">{pod.title}</h3>
                   </div>
-                  {pod.subpods.map((sp, j) => (
-                    <div key={j} className="mt-3">
-                      {sp.img && (
-                        <div className="bg-white rounded-lg p-4 inline-block">
+                  <div className="p-4">
+                    {pod.subpods.map((sp, j) => (
+                      <div key={j}>
+                        {sp.img && (
                           <Image
                             src={sp.img.src}
                             alt={sp.img.alt || 'Wolfram Alpha result'}
                             width={600}
                             height={150}
                             unoptimized
-                            className="rounded"
+                            className="w-full h-auto"
+                            style={{ filter: 'invert(1) hue-rotate(180deg)' }}
                           />
-                        </div>
-                      )}
-                      {sp.plaintext && (
-                        /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                          <div className="bg-[#1F1F1F] rounded-lg p-4 border border-gray-600">
-                            <BlockMath math={toLatex(sp.plaintext)} />
-                          </div>
-                        ) : (
-                          <p className="text-gray-300 leading-relaxed">{sp.plaintext}</p>
-                        )
-                      )}
-                    </div>
-                  ))}
+                        )}
+                        {sp.plaintext && (
+                          /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
+                            <div className="text-center py-2">
+                              <BlockMath math={toLatex(sp.plaintext)} />
+                            </div>
+                          ) : (
+                            <p className="text-gray-300 text-sm">{sp.plaintext}</p>
+                          )
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -280,41 +281,40 @@ export default function Home() {
 
             {/* Step-by-step results */}
             {stepPods.length > 0 && (
-              <div className="mt-6 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700/50 rounded-lg p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">📝</span>
-                  <h2 className="text-xl font-bold text-green-400">Step-by-Step Solution</h2>
+              <div className="mt-6 bg-[#2A2A2A] border border-gray-700 rounded-lg overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 bg-[#1F1F1F] border-b border-gray-700">
+                  <span className="text-lg">📝</span>
+                  <h2 className="text-sm font-bold text-green-400">Step-by-Step Solution</h2>
                 </div>
-                <div className="space-y-4">
+                <div className="p-4 space-y-3">
                   {stepPods.map((pod, i) => (
-                    <div key={`steps-${i}`} className="bg-[#1F1F1F] border border-gray-700 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="flex items-center justify-center w-6 h-6 bg-green-500 text-black text-sm font-bold rounded-full">
+                    <div key={`steps-${i}`} className="bg-[#1F1F1F] border border-gray-700 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="flex items-center justify-center w-5 h-5 bg-green-500 text-black text-xs font-bold rounded-full">
                           {i + 1}
                         </span>
-                        <h3 className="text-sm font-semibold text-gray-300">{pod.title}</h3>
+                        <h3 className="text-xs font-semibold text-gray-400">{pod.title}</h3>
                       </div>
                       {pod.subpods.map((sp, j) => (
-                        <div key={`steps-sp-${j}`} className="ml-8">
+                        <div key={`steps-sp-${j}`} className="ml-7">
                           {sp.img && (
-                            <div className="bg-white rounded-lg p-4 inline-block mb-2">
-                              <Image
-                                src={sp.img.src}
-                                alt={sp.img.alt || 'Wolfram Alpha step result'}
-                                width={600}
-                                height={150}
-                                unoptimized
-                                className="rounded"
-                              />
-                            </div>
+                            <Image
+                              src={sp.img.src}
+                              alt={sp.img.alt || 'Wolfram Alpha step result'}
+                              width={600}
+                              height={150}
+                              unoptimized
+                              className="w-full h-auto"
+                              style={{ filter: 'invert(1) hue-rotate(180deg)' }}
+                            />
                           )}
                           {sp.plaintext && (
                             /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                              <div className="bg-[#2A2A2A] rounded-lg p-4 border border-gray-600">
+                              <div className="text-center py-2">
                                 <BlockMath math={toLatex(sp.plaintext)} />
                               </div>
                             ) : (
-                              <p className="text-gray-300 leading-relaxed">{sp.plaintext}</p>
+                              <p className="text-gray-300 text-sm">{sp.plaintext}</p>
                             )
                           )}
                         </div>
