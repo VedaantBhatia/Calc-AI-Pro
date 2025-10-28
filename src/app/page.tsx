@@ -163,34 +163,36 @@ export default function Home() {
 
         {pods.length > 0 && (
           <>
-            <div className="mt-8 space-y-4">
+            <div className="mt-6 space-y-3">
               {pods.map((pod, i) => (
                 <div key={i} className="bg-[#2A2A2A] border border-gray-700 rounded-lg overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 bg-[#1F1F1F] border-b border-gray-700">
-                    <div className="w-1 h-4 bg-green-500 rounded"></div>
-                    <h3 className="text-sm font-semibold text-green-400">{pod.title}</h3>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-[#1F1F1F] border-b border-gray-700">
+                    <div className="w-0.5 h-3 bg-green-500 rounded"></div>
+                    <h3 className="text-xs font-semibold text-green-400 uppercase">{pod.title}</h3>
                   </div>
-                  <div className="p-4">
+                  <div className="p-3">
                     {pod.subpods.map((sp, j) => (
-                      <div key={j}>
+                      <div key={j} className="flex items-center justify-center">
                         {sp.img && (
-                          <Image
-                            src={sp.img.src}
-                            alt={sp.img.alt || 'Wolfram Alpha result'}
-                            width={600}
-                            height={150}
-                            unoptimized
-                            className="w-full h-auto"
-                            style={{ filter: 'invert(1) hue-rotate(180deg)' }}
-                          />
+                          <div className="max-w-[200px] max-h-[80px] overflow-hidden flex items-center justify-center">
+                            <Image
+                              src={sp.img.src}
+                              alt={sp.img.alt || 'Wolfram Alpha result'}
+                              width={200}
+                              height={80}
+                              unoptimized
+                              className="object-contain"
+                              style={{ filter: 'invert(1) hue-rotate(180deg)', maxHeight: '80px' }}
+                            />
+                          </div>
                         )}
-                        {sp.plaintext && (
+                        {sp.plaintext && !sp.img && (
                           /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                            <div className="text-center py-2">
+                            <div className="text-center text-sm">
                               <BlockMath math={toLatex(sp.plaintext)} />
                             </div>
                           ) : (
-                            <p className="text-gray-300 text-sm">{sp.plaintext}</p>
+                            <p className="text-gray-300 text-sm text-center">{sp.plaintext}</p>
                           )
                         )}
                       </div>
@@ -282,39 +284,41 @@ export default function Home() {
             {/* Step-by-step results */}
             {stepPods.length > 0 && (
               <div className="mt-6 bg-[#2A2A2A] border border-gray-700 rounded-lg overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 bg-[#1F1F1F] border-b border-gray-700">
-                  <span className="text-lg">📝</span>
-                  <h2 className="text-sm font-bold text-green-400">Step-by-Step Solution</h2>
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#1F1F1F] border-b border-gray-700">
+                  <span className="text-sm">📝</span>
+                  <h2 className="text-xs font-bold text-green-400 uppercase">Step-by-Step Solution</h2>
                 </div>
-                <div className="p-4 space-y-3">
+                <div className="p-3 space-y-2">
                   {stepPods.map((pod, i) => (
-                    <div key={`steps-${i}`} className="bg-[#1F1F1F] border border-gray-700 rounded-lg p-3">
+                    <div key={`steps-${i}`} className="bg-[#1F1F1F] border border-gray-700 rounded p-2">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="flex items-center justify-center w-5 h-5 bg-green-500 text-black text-xs font-bold rounded-full">
+                        <span className="flex items-center justify-center w-4 h-4 bg-green-500 text-black text-xs font-bold rounded-full">
                           {i + 1}
                         </span>
                         <h3 className="text-xs font-semibold text-gray-400">{pod.title}</h3>
                       </div>
                       {pod.subpods.map((sp, j) => (
-                        <div key={`steps-sp-${j}`} className="ml-7">
+                        <div key={`steps-sp-${j}`} className="ml-6 flex items-center justify-center">
                           {sp.img && (
-                            <Image
-                              src={sp.img.src}
-                              alt={sp.img.alt || 'Wolfram Alpha step result'}
-                              width={600}
-                              height={150}
-                              unoptimized
-                              className="w-full h-auto"
-                              style={{ filter: 'invert(1) hue-rotate(180deg)' }}
-                            />
+                            <div className="max-w-[200px] max-h-[80px] overflow-hidden flex items-center justify-center">
+                              <Image
+                                src={sp.img.src}
+                                alt={sp.img.alt || 'Wolfram Alpha step result'}
+                                width={200}
+                                height={80}
+                                unoptimized
+                                className="object-contain"
+                                style={{ filter: 'invert(1) hue-rotate(180deg)', maxHeight: '80px' }}
+                              />
+                            </div>
                           )}
-                          {sp.plaintext && (
+                          {sp.plaintext && !sp.img && (
                             /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                              <div className="text-center py-2">
+                              <div className="text-center text-sm">
                                 <BlockMath math={toLatex(sp.plaintext)} />
                               </div>
                             ) : (
-                              <p className="text-gray-300 text-sm">{sp.plaintext}</p>
+                              <p className="text-gray-300 text-xs text-center">{sp.plaintext}</p>
                             )
                           )}
                         </div>
