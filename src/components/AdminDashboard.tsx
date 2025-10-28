@@ -6,9 +6,19 @@ import AuthButton from './AuthButton'
 
 type View = 'users' | 'analytics' | 'management' | 'settings'
 
+interface Analytics {
+  totalUsers: number
+  totalCalculations: number
+  calculationsByType: {
+    differentiate?: number
+    integrate?: number
+    arithmetic?: number
+  }
+}
+
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<View>('users')
-  const [analytics, setAnalytics] = useState<any>(null)
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [loadingAnalytics, setLoadingAnalytics] = useState(false)
 
   const loadAnalytics = async () => {
@@ -149,7 +159,7 @@ export default function AdminDashboard() {
                         <div className="w-full bg-gray-800 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                            style={{ width: `${analytics.totalCalculations > 0 ? (analytics.calculationsByType?.differentiate / analytics.totalCalculations * 100) : 0}%` }}
+                            style={{ width: `${analytics.totalCalculations > 0 ? ((analytics.calculationsByType?.differentiate || 0) / analytics.totalCalculations * 100) : 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -161,7 +171,7 @@ export default function AdminDashboard() {
                         <div className="w-full bg-gray-800 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
-                            style={{ width: `${analytics.totalCalculations > 0 ? (analytics.calculationsByType?.integrate / analytics.totalCalculations * 100) : 0}%` }}
+                            style={{ width: `${analytics.totalCalculations > 0 ? ((analytics.calculationsByType?.integrate || 0) / analytics.totalCalculations * 100) : 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -173,7 +183,7 @@ export default function AdminDashboard() {
                         <div className="w-full bg-gray-800 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full"
-                            style={{ width: `${analytics.totalCalculations > 0 ? (analytics.calculationsByType?.arithmetic / analytics.totalCalculations * 100) : 0}%` }}
+                            style={{ width: `${analytics.totalCalculations > 0 ? ((analytics.calculationsByType?.arithmetic || 0) / analytics.totalCalculations * 100) : 0}%` }}
                           ></div>
                         </div>
                       </div>

@@ -13,12 +13,12 @@ function ensureDataDir() {
   }
 }
 
-function readUsers() {
+function readUsers(): User[] {
   try {
     ensureDataDir()
     if (fs.existsSync(USERS_FILE)) {
       const data = fs.readFileSync(USERS_FILE, 'utf-8')
-      return JSON.parse(data)
+      return JSON.parse(data) as User[]
     }
   } catch (error) {
     console.error('Error reading users:', error)
@@ -26,7 +26,17 @@ function readUsers() {
   return []
 }
 
-function writeUsers(users: any[]) {
+interface User {
+  id: string
+  name: string
+  email: string
+  image: string | null
+  lastSeen: string
+  role: string
+  createdAt: string
+}
+
+function writeUsers(users: User[]) {
   try {
     ensureDataDir()
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2))
@@ -51,14 +61,14 @@ export async function GET() {
     const currentUserEmail = session.user?.email
     const ADMIN_EMAIL = 'bhatiav0909@gmail.com'
     
-    let userIndex = users.findIndex((u: any) => u.email === currentUserEmail)
+    const userIndex = users.findIndex((u: User) => u.email === currentUserEmail)
     
     if (userIndex === -1) {
       // Add new user
       users.push({
         id: session.user?.id || `user-${Date.now()}`,
         name: session.user?.name || 'Unknown',
-        email: currentUserEmail,
+        email: currentUserEmail || '',
         image: session.user?.image || null,
         lastSeen: new Date().toISOString(),
         role: currentUserEmail === ADMIN_EMAIL ? 'admin' : 'user',
