@@ -88,21 +88,23 @@ export default function Home() {
           {"Your AI-powered calculus assistant. Enter an expression, choose an operation, and let AI do the math! It's mathemagical!"}
         </p>
 
-        {/* Navigation Links */}
-        <div className="flex gap-4 mb-6">
-          <Link
-            href="/demo"
-            className="text-blue-400 hover:text-blue-300 underline text-sm"
-          >
-            View OAuth Demo
-          </Link>
-          <Link
-            href="/admin"
-            className="text-purple-400 hover:text-purple-300 underline text-sm"
-          >
-            Admin Dashboard
-          </Link>
-        </div>
+        {/* Navigation Links - Only show to admin */}
+        {session?.user?.email === 'bhatiav0909@gmail.com' && (
+          <div className="flex gap-4 mb-6">
+            <Link
+              href="/demo"
+              className="text-blue-400 hover:text-blue-300 underline text-sm"
+            >
+              View OAuth Demo
+            </Link>
+            <Link
+              href="/admin"
+              className="text-purple-400 hover:text-purple-300 underline text-sm"
+            >
+              Admin Dashboard
+            </Link>
+          </div>
+        )}
 
         {/* Show message if not authenticated */}
         {status === 'loading' && (

@@ -1,11 +1,20 @@
 import UsersList from '@/components/UsersList'
 import AuthButton from '@/components/AuthButton'
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 /**
  * Admin page to view users and manage the application
- * Requires authentication to access
+ * RESTRICTED: Only accessible by admin (bhatiav0909@gmail.com)
  */
-export default function AdminPage() {
+export default async function AdminPage() {
+  const session = await auth()
+  
+  // Restrict access to admin only
+  const ADMIN_EMAIL = 'bhatiav0909@gmail.com'
+  if (!session || session.user?.email !== ADMIN_EMAIL) {
+    redirect('/')
+  }
   return (
     <main className="min-h-screen bg-[#121212] text-white px-4 py-12">
       <div className="max-w-6xl mx-auto">

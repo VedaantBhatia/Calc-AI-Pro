@@ -1,14 +1,25 @@
 import UserProfile from '@/components/UserProfile'
 import ServerUserInfo from '@/components/ServerUserInfo'
 import AuthButton from '@/components/AuthButton'
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 /**
  * Demo page showing Steps 4-6 from OAUTH_SETUP.md
  * - Step 4: AuthButton component usage
  * - Step 5: Client-side session usage (UserProfile)
  * - Step 6: Server-side session usage (ServerUserInfo)
+ * 
+ * RESTRICTED: Only accessible by admin (bhatiav0909@gmail.com)
  */
-export default function DemoPage() {
+export default async function DemoPage() {
+  const session = await auth()
+  
+  // Restrict access to admin only
+  const ADMIN_EMAIL = 'bhatiav0909@gmail.com'
+  if (!session || session.user?.email !== ADMIN_EMAIL) {
+    redirect('/')
+  }
   return (
     <main className="min-h-screen bg-[#121212] text-white px-4 py-12">
       <div className="max-w-4xl mx-auto">
