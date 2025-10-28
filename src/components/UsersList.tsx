@@ -1,3 +1,7 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 
 interface User {
@@ -88,7 +92,7 @@ export default function UsersList() {
         <div className="text-center text-gray-400 py-8">Loading users...</div>
       ) : (
         <div className="space-y-3">
-          {users.map((user) => (
+          {users.map((user: User) => (
             <div
               key={user.id}
               className={`p-4 rounded-lg border ${
@@ -100,10 +104,12 @@ export default function UsersList() {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-semibold">
                   {user.image ? (
-                    <img
+                    <Image
                       src={user.image}
                       alt={user.name}
-                      className="w-10 h-10 rounded-full"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
                     />
                   ) : (
                     user.name.charAt(0).toUpperCase()

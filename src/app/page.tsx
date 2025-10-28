@@ -33,7 +33,7 @@ type Pod = {
 export default function Home() {
   const { data: session, status } = useSession();
   const [expr, setExpr] = useState('');
-  const [type, setType] = useState<'differentiate' | 'integrate'>('differentiate');
+  const [type, setType] = useState<'differentiate' | 'integrate' | 'arithmetic'>('differentiate');
   const [pods, setPods] = useState<Pod[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,10 +128,11 @@ export default function Home() {
             <select
               className="w-full px-4 py-3 text-base rounded-lg bg-[#2A2A2A] border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               value={type}
-              onChange={e => setType(e.target.value as 'differentiate' | 'integrate')}
+              onChange={e => setType(e.target.value as 'differentiate' | 'integrate' | 'arithmetic')}
             >
               <option value="differentiate">Derivative</option>
               <option value="integrate">Integral</option>
+              <option value="arithmetic">Arithmetic</option>
             </select>
           </div>
 
