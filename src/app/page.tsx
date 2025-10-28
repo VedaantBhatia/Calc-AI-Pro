@@ -163,27 +163,34 @@ export default function Home() {
 
         {pods.length > 0 && (
           <>
-            <div className="mt-8 space-y-6 bg-[#2A2A2A] border border-gray-700 rounded-lg p-6 text-gray-100">
+            <div className="mt-8 space-y-4">
               {pods.map((pod, i) => (
-                <div key={i}>
-                  <h3 className="text-sm text-gray-400 uppercase mb-2">{pod.title}</h3>
+                <div key={i} className="bg-[#2A2A2A] border border-gray-700 rounded-lg p-5 shadow-md">
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-700">
+                    <div className="w-1 h-5 bg-green-500 rounded"></div>
+                    <h3 className="text-base font-semibold text-green-400">{pod.title}</h3>
+                  </div>
                   {pod.subpods.map((sp, j) => (
-                    <div key={j} className="mb-4">
+                    <div key={j} className="mt-3">
                       {sp.img && (
-                        <Image
-                          src={sp.img.src}
-                          alt={sp.img.alt || 'Wolfram Alpha result'}
-                          width={600}
-                          height={150}
-                          unoptimized
-                          className="rounded-lg border border-gray-600"
-                        />
+                        <div className="bg-white rounded-lg p-4 inline-block">
+                          <Image
+                            src={sp.img.src}
+                            alt={sp.img.alt || 'Wolfram Alpha result'}
+                            width={600}
+                            height={150}
+                            unoptimized
+                            className="rounded"
+                          />
+                        </div>
                       )}
                       {sp.plaintext && (
                         /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                          <BlockMath math={toLatex(sp.plaintext)} />
+                          <div className="bg-[#1F1F1F] rounded-lg p-4 border border-gray-600">
+                            <BlockMath math={toLatex(sp.plaintext)} />
+                          </div>
                         ) : (
-                          <p>{sp.plaintext}</p>
+                          <p className="text-gray-300 leading-relaxed">{sp.plaintext}</p>
                         )
                       )}
                     </div>
@@ -273,34 +280,48 @@ export default function Home() {
 
             {/* Step-by-step results */}
             {stepPods.length > 0 && (
-              <div className="mt-6 space-y-6 bg-[#2A2A2A] border border-gray-700 rounded-lg p-6 text-gray-100">
-                <h2 className="text-lg font-semibold text-green-400 mb-2">Step-by-step solution</h2>
-                {stepPods.map((pod, i) => (
-                  <div key={`steps-${i}`}>
-                    <h3 className="text-sm text-gray-400 uppercase mb-2">{pod.title}</h3>
-                    {pod.subpods.map((sp, j) => (
-                      <div key={`steps-sp-${j}`} className="mb-4">
-                        {sp.img && (
-                          <Image
-                            src={sp.img.src}
-                            alt={sp.img.alt || 'Wolfram Alpha step result'}
-                            width={600}
-                            height={150}
-                            unoptimized
-                            className="rounded-lg border border-gray-600"
-                          />
-                        )}
-                        {sp.plaintext && (
-                          /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
-                            <BlockMath math={toLatex(sp.plaintext)} />
-                          ) : (
-                            <p>{sp.plaintext}</p>
-                          )
-                        )}
+              <div className="mt-6 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700/50 rounded-lg p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-2xl">📝</span>
+                  <h2 className="text-xl font-bold text-green-400">Step-by-Step Solution</h2>
+                </div>
+                <div className="space-y-4">
+                  {stepPods.map((pod, i) => (
+                    <div key={`steps-${i}`} className="bg-[#1F1F1F] border border-gray-700 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="flex items-center justify-center w-6 h-6 bg-green-500 text-black text-sm font-bold rounded-full">
+                          {i + 1}
+                        </span>
+                        <h3 className="text-sm font-semibold text-gray-300">{pod.title}</h3>
                       </div>
-                    ))}
-                  </div>
-                ))}
+                      {pod.subpods.map((sp, j) => (
+                        <div key={`steps-sp-${j}`} className="ml-8">
+                          {sp.img && (
+                            <div className="bg-white rounded-lg p-4 inline-block mb-2">
+                              <Image
+                                src={sp.img.src}
+                                alt={sp.img.alt || 'Wolfram Alpha step result'}
+                                width={600}
+                                height={150}
+                                unoptimized
+                                className="rounded"
+                              />
+                            </div>
+                          )}
+                          {sp.plaintext && (
+                            /^[^a-zA-Z]*[=^]/.test(sp.plaintext) ? (
+                              <div className="bg-[#2A2A2A] rounded-lg p-4 border border-gray-600">
+                                <BlockMath math={toLatex(sp.plaintext)} />
+                              </div>
+                            ) : (
+                              <p className="text-gray-300 leading-relaxed">{sp.plaintext}</p>
+                            )
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </>
