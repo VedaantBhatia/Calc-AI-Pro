@@ -30,8 +30,19 @@ type Pod = {
   states?: { name: string; input: string }[];
 };
 
+type User = {
+  email?: string | null;
+  subscriptionStatus?: 'active' | 'inactive' | null;
+  [key: string]: string | number | boolean | null | undefined | object;
+};
+
+type Session = {
+  user?: User | null;
+  [key: string]: User | null | undefined | string | number | boolean | object;
+};
+
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as { data: Session | null; status: string };
   const [expr, setExpr] = useState('');
   const [type, setType] = useState<'differentiate' | 'integrate' | 'arithmetic'>('differentiate');
   const [pods, setPods] = useState<Pod[]>([]);
@@ -70,32 +81,40 @@ export default function Home() {
     } catch (err) {
       console.error(err);
       setError('Network error');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-[#0a0a0a] to-gray-900 text-white px-4 py-8">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-green-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-      </div>
-
-      <div className="relative max-w-4xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 text-white p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20">
               <span className="text-2xl font-bold text-white">∑</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">CalcAI Pro</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                CalcAI Pro
+              </h1>
               <p className="text-xs text-gray-400">AI-Powered Math Assistant</p>
             </div>
           </div>
-          <AuthButton />
+          
+          <div className="flex items-center gap-4">
+            {session && (
+              <div className="px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-emerald-500/30">
+                {session.user?.subscriptionStatus === 'active' ? 'Pro Plan' : 'Free Plan'}
+              </div>
+            )}
+            <Link
+              href="/pricing"
+              className="px-4 py-2 text-sm font-medium text-gray-200 hover:text-white transition-colors"
+            >
+              Pricing
+            </Link>
+            <AuthButton />
+          </div>
         </div>
 
         {/* Navigation Links - Only show to admin */}
@@ -251,11 +270,13 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Step-by-step button */}
-            <div className="text-center mt-6">
-              <button
-                className="px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-500/30 rounded-xl text-blue-400 font-semibold transition-all shadow-lg hover:shadow-blue-500/20"
-                onClick={async () => {
+            {/* Step-by-step button - Only show for pro users */}
+            {session ? (
+              session.user?.subscriptionStatus === 'active' ? (
+              <div className="text-center mt-6">
+                <button
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-500/30 rounded-xl text-blue-400 font-semibold transition-all shadow-lg hover:shadow-blue-500/20"
+                  onClick={async () => {
                   setStepLoading(true);
                   setStepPods([]);
                   setStepError(null);
@@ -341,6 +362,16 @@ export default function Home() {
                 </div>
               )}
             </div>
+            ) : (
+              <div className="text-center mt-6">
+                <Link href="/pricing" className="inline-block">
+                  <button className="px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-500/30 rounded-xl text-blue-400 font-semibold transition-all shadow-lg hover:shadow-blue-500/20">
+                    Upgrade to Pro for Step-by-Step Solutions
+                  </button>
+                </Link>
+              </div>
+            )
+            ) : null}
 
             {/* Step-by-step results */}
             {stepPods.length > 0 && (
@@ -397,7 +428,7 @@ export default function Home() {
           <p>Powered by Wolfram Alpha API • Built with Next.js & TailwindCSS</p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

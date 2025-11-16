@@ -177,7 +177,7 @@ export default function AdminDashboard() {
                       </div>
                       <div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-400">Arithmetic</span>
+                          <span className="text-gray-400">Algebra</span>
                           <span className="text-green-400">{analytics.calculationsByType?.arithmetic || 0}</span>
                         </div>
                         <div className="w-full bg-gray-800 rounded-full h-2">
